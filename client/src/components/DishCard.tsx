@@ -1,0 +1,106 @@
+import { Pencil, Trash2, Moon, Check, Users } from 'lucide-react';
+import type { Dish } from '../lib/types';
+
+const CATEGORY_COLORS: Record<string, string> = {
+  Starter: 'bg-green-100 text-green-700',
+  Main: 'bg-amber-100 text-amber-700',
+  Side: 'bg-blue-100 text-blue-700',
+  Dessert: 'bg-pink-100 text-pink-700',
+  Drink: 'bg-purple-100 text-purple-700',
+  Snack: 'bg-orange-100 text-orange-700',
+};
+
+interface Props {
+  dish: Dish;
+  isTonight: boolean;
+  onToggleTonight: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+}
+
+export default function DishCard({ dish, isTonight, onToggleTonight, onEdit, onDelete }: Props) {
+  const colorClass = CATEGORY_COLORS[dish.category] ?? 'bg-gray-100 text-gray-700';
+
+  return (
+    <div className={`bg-white rounded-xl border-2 transition-all shadow-sm hover:shadow-md overflow-hidden ${isTonight ? 'border-amber-400' : 'border-transparent'}`}>
+      {dish.image && (
+        <img
+          src={`/uploads/${dish.image}`}
+          alt={dish.name}
+          className="w-full h-40 object-cover"
+        />
+      )}
+      <div className="p-4">
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <h3 className="font-semibold text-gray-800 leading-tight">{dish.name}</h3>
+          <span className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${colorClass}`}>
+            {dish.category}
+          </span>
+        </div>
+
+        {dish.description && (
+          <p className="text-sm text-gray-500 mb-3 line-clamp-2">{dish.description}</p>
+        )}
+
+        <div className="flex items-center gap-3 text-xs text-gray-400 mb-3">
+          <span className="flex items-center gap-1">
+            <Users size={12} />
+            {dish.servings} servings
+          </span>
+          <span>{dish.ingredients.length} ingredient{dish.ingredients.length !== 1 ? 's' : ''}</span>
+        </div>
+
+        {dish.ingredients.length > 0 && (
+          <div className="border-t border-gray-100 pt-3 mb-4">
+            <ul className="space-y-1">
+              {dish.ingredients.slice(0, 4).map((ing) => (
+                <li key={ing.id} className="text-xs text-gray-600 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
+                  <span className="font-medium">{ing.name}</span>
+                  {(ing.quantity || ing.unit) && (
+                    <span className="text-gray-400">
+                      — {[ing.quantity, ing.unit].filter(Boolean).join(' ')}
+                    </span>
+                  )}
+                </li>
+              ))}
+              {dish.ingredients.length > 4 && (
+                <li className="text-xs text-gray-400 pl-3">
+                  +{dish.ingredients.length - 4} more
+                </li>
+              )}
+            </ul>
+          </div>
+        )}
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onToggleTonight}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-sm font-medium transition-colors ${
+              isTonight
+                ? 'bg-amber-500 text-white hover:bg-amber-600'
+                : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
+            }`}
+          >
+            {isTonight ? <Check size={14} /> : <Moon size={14} />}
+            {isTonight ? 'On Tonight\'s Menu' : 'Add to Tonight'}
+          </button>
+          <button
+            onClick={onEdit}
+            className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+            title="Edit dish"
+          >
+            <Pencil size={15} />
+          </button>
+          <button
+            onClick={onDelete}
+            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+            title="Delete dish"
+          >
+            <Trash2 size={15} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
