@@ -6,11 +6,13 @@ import authRouter from './routes/auth';
 import householdsRouter from './routes/households';
 import dishesRouter from './routes/dishes';
 import mealPlanRouter from './routes/mealPlan';
+import feedRouter from './routes/feed';
 
 const app = express();
 const PORT = process.env.PORT || 3002;
 
-app.use(cors({ origin: 'http://localhost:5174' }));
+const allowedOrigins = (process.env.CLIENT_URL ?? 'http://localhost:5174').split(',').map(s => s.trim());
+app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
@@ -22,6 +24,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/households', householdsRouter);
 app.use('/api/dishes', dishesRouter);
 app.use('/api/meal-plan', mealPlanRouter);
+app.use('/api/feed', feedRouter);
 
 app.listen(PORT, () => {
   console.log(`Meal Planner server running on http://localhost:${PORT}`);

@@ -7,12 +7,20 @@ server/.env
 server/data.db
 server/data.db-shm
 server/data.db-wal
+server/data/
 server/uploads/
+
+# Nginx host configs (server-specific)
+nginx-host.conf
+qincard-clean.conf
 
 # Client
 client/node_modules/
 client/dist/
 client/.env
+
+# Root .env (docker-compose secrets)
+.env
 
 # Misc
 .DS_Store

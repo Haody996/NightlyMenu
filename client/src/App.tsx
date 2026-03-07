@@ -1,8 +1,9 @@
 import { BrowserRouter, Routes, Route, NavLink, Navigate, Link } from 'react-router-dom';
-import { UtensilsCrossed, ShoppingCart, Home, LogOut, LogIn } from 'lucide-react';
+import { UtensilsCrossed, ShoppingCart, Home, LogOut, LogIn, Sparkles, BookOpen } from 'lucide-react';
 import { useAuth } from './contexts/AuthContext';
 import MenuPage      from './pages/MenuPage';
 import TonightPage   from './pages/TonightPage';
+import FeedPage      from './pages/FeedPage';
 import LoginPage     from './pages/LoginPage';
 import RegisterPage  from './pages/RegisterPage';
 import HouseholdPage from './pages/HouseholdPage';
@@ -46,17 +47,25 @@ function Layout({ children }: { children: React.ReactNode }) {
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center gap-4 flex-wrap">
           <Link to="/" className="flex items-center gap-2 text-amber-700 font-bold text-xl">
             <UtensilsCrossed size={24} />
-            Meal Planner
+            Dinnerly
           </Link>
 
           {/* Nav links — always visible */}
           <nav className="flex gap-1">
-            <NavLink to="/" end className={navLink}>Menu</NavLink>
+            <NavLink to="/" end className={({ isActive }) => `${navLink({ isActive })} flex items-center gap-1.5`}>
+              <BookOpen size={14} />Menu
+            </NavLink>
             <NavLink
               to="/tonight"
               className={({ isActive }) => `${navLink({ isActive })} flex items-center gap-1.5`}
             >
               <ShoppingCart size={14} />Tonight
+            </NavLink>
+            <NavLink
+              to="/feed"
+              className={({ isActive }) => `${navLink({ isActive })} flex items-center gap-1.5`}
+            >
+              <Sparkles size={14} />Community
             </NavLink>
           </nav>
 
@@ -126,6 +135,7 @@ export default function App() {
         {/* Public — no redirect, pages handle unauthenticated state themselves */}
         <Route path="/"        element={<Layout><MenuPage /></Layout>} />
         <Route path="/tonight" element={<Layout><TonightPage /></Layout>} />
+        <Route path="/feed"    element={<Layout><FeedPage /></Layout>} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

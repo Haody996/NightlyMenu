@@ -38,7 +38,7 @@ export default function RegisterPage() {
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-8">
         <div className="flex items-center gap-2 text-amber-700 font-bold text-xl mb-8 justify-center">
           <UtensilsCrossed size={24} />
-          Meal Planner
+          Dinnerly
         </div>
 
         <h1 className="text-xl font-semibold text-gray-800 mb-6 text-center">Create account</h1>

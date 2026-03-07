@@ -1,0 +1,44 @@
+services:
+  server:
+    build: ./server
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3002
+      JWT_SECRET: ${JWT_SECRET}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      CLIENT_URL: ${CLIENT_URL}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      EMAIL_FROM: ${EMAIL_FROM:-}
+      APP_URL: ${APP_URL}
+    volumes:
+      - ./server/data:/app/data
+      - server_uploads:/app/uploads
+    networks:
+      - internal
+
+  client:
+    build:
+      context: ./client
+      args:
+        VITE_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    depends_on:
+      - server
+    networks:
+      - internal
+      - proxy      # joins your existing reverse proxy network
+
+volumes:
+  server_uploads:
+
+networks:
+  internal:
+  proxy:
+    external: true  # your existing proxy network
