@@ -83,7 +83,9 @@ export default function MenuPage() {
       } else if (data.imageFile instanceof File) {
         const form = new FormData();
         form.append('image', data.imageFile);
-        await api.post(`/dishes/${dishId}/image`, form);
+        await api.post(`/dishes/${dishId}/image`, form, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
       }
     },
     onSuccess: () => {
@@ -256,6 +258,8 @@ export default function MenuPage() {
           dish={modalDish}
           onClose={() => setModalDish(undefined)}
           onSave={({ imageFile, ...payload }) => saveMutation.mutate({ id: modalDish?.id, payload, imageFile })}
+          saving={saveMutation.isPending}
+          serverError={saveMutation.error ? (saveMutation.error as Error).message || 'Failed to save dish' : undefined}
         />
       )}
     </div>

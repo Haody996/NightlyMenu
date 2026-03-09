@@ -19,6 +19,8 @@ interface Props {
     imageFile?: File | null;
   }) => void;
   onClose: () => void;
+  saving?: boolean;
+  serverError?: string;
 }
 
 const CATEGORIES = ['Starter', 'Main', 'Side', 'Dessert', 'Drink', 'Snack'];
@@ -28,7 +30,7 @@ function toIngredientDraft(ing: Ingredient): IngredientDraft {
   return { name: ing.name, quantity: ing.quantity, unit: ing.unit };
 }
 
-export default function DishModal({ dish, onSave, onClose }: Props) {
+export default function DishModal({ dish, onSave, onClose, saving, serverError }: Props) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('Main');
@@ -111,9 +113,9 @@ export default function DishModal({ dish, onSave, onClose }: Props) {
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
-          {error && (
+          {(error || serverError) && (
             <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-              {error}
+              {error || serverError}
             </div>
           )}
 
@@ -272,9 +274,10 @@ export default function DishModal({ dish, onSave, onClose }: Props) {
             </button>
             <button
               type="submit"
-              className="flex-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg py-2.5 text-sm font-medium transition-colors"
+              disabled={saving}
+              className="flex-1 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg py-2.5 text-sm font-medium transition-colors"
             >
-              {dish ? 'Save Changes' : 'Add Dish'}
+              {saving ? 'Saving...' : dish ? 'Save Changes' : 'Add Dish'}
             </button>
           </div>
         </form>
