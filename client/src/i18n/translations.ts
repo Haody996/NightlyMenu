@@ -85,18 +85,27 @@ const en = {
   qtyPlaceholder: 'Qty',
   dishNameRequired: 'Dish name is required.',
 
-  // LoginPage
+  // LoginPage / OTP
   signInHeading: 'Sign in',
   emailLabel: 'Email',
+  nameLabel: 'Name',
+  yourNamePlaceholder: 'Your name',
+  sendCode: 'Send code',
+  sendingCode: 'Sending...',
+  codeSentTo: 'We sent a 6-digit code to',
+  codeLabel: 'Code',
+  verifyCode: 'Sign in',
+  verifyingCode: 'Verifying...',
+  changeEmail: '← Change email',
+  sendCodeFailed: 'Failed to send code',
+  invalidCode: 'Invalid or expired code',
+
+  // RegisterPage (kept for compat)
+  createAccount: 'Create account',
   passwordLabel: 'Password',
   signingIn: 'Signing in...',
   noAccount: 'No account?',
   loginFailed: 'Login failed',
-
-  // RegisterPage
-  createAccount: 'Create account',
-  nameLabel: 'Name',
-  yourNamePlaceholder: 'Your name',
   minPasswordHint: 'Min. 8 characters',
   confirmPassword: 'Confirm Password',
   creatingAccount: 'Creating account...',
@@ -278,18 +287,27 @@ const zh: typeof en = {
   qtyPlaceholder: '数量',
   dishNameRequired: '菜品名称为必填项。',
 
-  // LoginPage
+  // LoginPage / OTP
   signInHeading: '登录',
   emailLabel: '邮箱',
+  nameLabel: '姓名',
+  yourNamePlaceholder: '您的姓名',
+  sendCode: '发送验证码',
+  sendingCode: '发送中...',
+  codeSentTo: '我们已发送 6 位验证码至',
+  codeLabel: '验证码',
+  verifyCode: '登录',
+  verifyingCode: '验证中...',
+  changeEmail: '← 更改邮箱',
+  sendCodeFailed: '发送验证码失败',
+  invalidCode: '验证码无效或已过期',
+
+  // RegisterPage (kept for compat)
+  createAccount: '创建账号',
   passwordLabel: '密码',
   signingIn: '登录中...',
   noAccount: '没有账号？',
   loginFailed: '登录失败',
-
-  // RegisterPage
-  createAccount: '创建账号',
-  nameLabel: '姓名',
-  yourNamePlaceholder: '您的姓名',
   minPasswordHint: '最少 8 个字符',
   confirmPassword: '确认密码',
   creatingAccount: '创建中...',

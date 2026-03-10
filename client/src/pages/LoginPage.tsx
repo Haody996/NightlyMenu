@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { UtensilsCrossed } from 'lucide-react';
 import api from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
@@ -8,30 +7,49 @@ import GoogleSignInButton from '../components/GoogleSignInButton';
 
 const isNative = !!(window as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor?.isNativePlatform?.();
 
+type Step = 'email' | 'code';
+
 export default function LoginPage() {
   const { login } = useAuth();
   const { T } = useLanguage();
-  const navigate = useNavigate();
-  const [email, setEmail]       = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError]       = useState('');
-  const [loading, setLoading]   = useState(false);
+  const [step, setStep]       = useState<Step>('email');
+  const [email, setEmail]     = useState('');
+  const [code, setCode]       = useState('');
+  const [name, setName]       = useState('');
+  const [isNew, setIsNew]     = useState(false);
+  const [error, setError]     = useState('');
+  const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSendCode(e: React.FormEvent) {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      const res = await api.post('/auth/login', { email, password });
+      const res = await api.post('/auth/send-code', { email });
+      setIsNew(res.data.isNew);
+      setStep('code');
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? T.sendCodeFailed;
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleVerifyCode(e: React.FormEvent) {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      const res = await api.post('/auth/verify-code', { email, code, name: name || undefined });
       const meRes = await api.request({
         url: '/auth/me',
         headers: { Authorization: `Bearer ${res.data.token}` },
       });
       login(res.data.token, res.data.user, meRes.data.household);
-      navigate(meRes.data.household ? '/' : '/household');
+      // navigate is handled by PublicOnlyRoute redirect after login
     } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { error?: string } } })
-        ?.response?.data?.error ?? T.loginFailed;
+      const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? T.invalidCode;
       setError(msg);
     } finally {
       setLoading(false);
@@ -57,6 +75,7 @@ export default function LoginPage() {
             <div className="flex-1 h-px bg-gray-200" />
           </div>
         )}
+        {isNative && <div className="mb-5" />}
 
         {error && (
           <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2 mb-4">
@@ -64,37 +83,63 @@ export default function LoginPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{T.emailLabel}</label>
-            <input
-              type="email" required value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{T.passwordLabel}</label>
-            <input
-              type="password" required value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-            />
-          </div>
-          <button
-            type="submit" disabled={loading}
-            className="w-full bg-amber-500 hover:bg-amber-600 text-white rounded-lg py-2.5 text-sm font-medium transition-colors disabled:opacity-60"
-          >
-            {loading ? T.signingIn : T.signInHeading}
-          </button>
-        </form>
-
-        <p className="text-center text-sm text-gray-500 mt-6">
-          {T.noAccount}{' '}
-          <Link to="/register" className="text-amber-600 hover:text-amber-700 font-medium">
-            {T.register}
-          </Link>
-        </p>
+        {step === 'email' ? (
+          <form onSubmit={handleSendCode} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{T.emailLabel}</label>
+              <input
+                type="email" required autoFocus value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+              />
+            </div>
+            <button
+              type="submit" disabled={loading}
+              className="w-full bg-amber-500 hover:bg-amber-600 text-white rounded-lg py-2.5 text-sm font-medium transition-colors disabled:opacity-60"
+            >
+              {loading ? T.sendingCode : T.sendCode}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleVerifyCode} className="space-y-4">
+            <p className="text-sm text-gray-500 text-center">
+              {T.codeSentTo} <span className="font-medium text-gray-700">{email}</span>
+            </p>
+            {isNew && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{T.nameLabel}</label>
+                <input
+                  type="text" value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder={T.yourNamePlaceholder}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                />
+              </div>
+            )}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{T.codeLabel}</label>
+              <input
+                type="text" required autoFocus inputMode="numeric" pattern="[0-9]{6}" maxLength={6}
+                value={code} onChange={(e) => setCode(e.target.value)}
+                placeholder="123456"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-center text-2xl tracking-widest font-mono focus:outline-none focus:ring-2 focus:ring-amber-400"
+              />
+            </div>
+            <button
+              type="submit" disabled={loading || code.length !== 6}
+              className="w-full bg-amber-500 hover:bg-amber-600 text-white rounded-lg py-2.5 text-sm font-medium transition-colors disabled:opacity-60"
+            >
+              {loading ? T.verifyingCode : T.verifyCode}
+            </button>
+            <button
+              type="button" onClick={() => { setStep('email'); setCode(''); setError(''); }}
+              className="w-full text-sm text-gray-500 hover:text-amber-700 py-1"
+            >
+              {T.changeEmail}
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );

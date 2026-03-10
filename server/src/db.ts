@@ -57,6 +57,14 @@ db.exec(`
     dish_id      INTEGER NOT NULL REFERENCES dishes(id) ON DELETE CASCADE,
     UNIQUE(household_id, date, dish_id)
   );
+
+  CREATE TABLE IF NOT EXISTS email_codes (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    email      TEXT    NOT NULL,
+    code       TEXT    NOT NULL,
+    expires_at INTEGER NOT NULL,
+    used       INTEGER NOT NULL DEFAULT 0
+  );
 `);
 
 // Idempotent migrations for existing DBs that pre-date household_id columns
