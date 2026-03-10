@@ -172,6 +172,9 @@ const en = {
   infoCtaH2: 'Ready to sort dinner?',
   infoCtaDesc: 'Join households already using Dinnerly to plan meals, share recipes, and make \u201cwhat\'s for dinner?\u201d a question of the past.',
   infoCreateHousehold: 'Create your household',
+  infoCommunityH2: 'See what households are cooking',
+  infoCommunityDesc: 'Real dishes from real households — browse for inspiration or discover recipes to add to your own menu.',
+  infoBrowseCommunity: 'Browse all dishes',
   infoFeaturesData: [
     { title: 'Your Household Cookbook', desc: 'Build a shared recipe collection with your household. Add ingredients, servings, photos, and categories to every dish.' },
     { title: "Tonight's Menu", desc: "Pick dishes from your menu and add them to tonight's plan. Everyone in the household sees what's for dinner." },
@@ -362,6 +365,9 @@ const zh: typeof en = {
   infoCtaH2: '准备好解决晚餐问题了吗？',
   infoCtaDesc: '加入已在使用 Dinnerly 规划餐食、分享食谱的家庭，让"今晚吃什么"成为历史。',
   infoCreateHousehold: '创建您的家庭',
+  infoCommunityH2: '看看各家在做什么',
+  infoCommunityDesc: '来自真实家庭的真实菜品 — 浏览获取灵感，或发现新食谱加入您的菜单。',
+  infoBrowseCommunity: '浏览所有菜品',
   infoFeaturesData: [
     { title: '家庭食谱库', desc: '与家庭成员共同建立食谱库。为每道菜添加食材、份数、照片和分类。' },
     { title: '今晚菜单', desc: '从菜单中选择菜品加入今晚计划。家庭中每个人都能看到今晚吃什么。' },

@@ -157,7 +157,7 @@ export default function FeedPage() {
   const dishes = data?.pages.flatMap((p) => p.dishes) ?? [];
 
   return (
-    <div className="max-w-xl mx-auto">
+    <div className="max-w-4xl mx-auto">
       <div className="flex items-center gap-3 mb-8">
         <Sparkles size={22} className="text-amber-500" />
         <div>
@@ -167,8 +167,8 @@ export default function FeedPage() {
       </div>
 
       {isLoading && (
-        <div className="space-y-4">
-          {[...Array(3)].map((_, i) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {[...Array(4)].map((_, i) => (
             <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse">
               <div className="aspect-[4/3] bg-gray-200" />
               <div className="p-5 space-y-3">
@@ -190,7 +190,7 @@ export default function FeedPage() {
         </div>
       )}
 
-      <div className="space-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {dishes.map((dish) => (
           <DishPost key={dish.id} dish={dish} />
         ))}

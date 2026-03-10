@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   UtensilsCrossed, Users, ShoppingCart,
@@ -5,11 +6,35 @@ import {
   ChefHat, Share2, Bell
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import api from '../lib/api';
+
+interface PreviewDish {
+  id: number;
+  name: string;
+  category: string;
+  image: string | null;
+  household_name: string;
+  description: string;
+}
+
+const CATEGORY_GRADIENTS: Record<string, string> = {
+  Starter: 'from-green-200 to-green-400',
+  Main: 'from-amber-200 to-orange-400',
+  Side: 'from-blue-200 to-blue-400',
+  Dessert: 'from-pink-200 to-rose-400',
+  Drink: 'from-purple-200 to-purple-400',
+  Snack: 'from-orange-200 to-orange-400',
+};
 
 const ICONS = [BookOpen, Moon, ShoppingCart, Users, Bell, Sparkles];
 
 export default function InfoPage() {
   const { lang, setLang, T } = useLanguage();
+  const [previewDishes, setPreviewDishes] = useState<PreviewDish[]>([]);
+
+  useEffect(() => {
+    api.get('/feed?limit=6').then(res => setPreviewDishes(res.data.dishes ?? [])).catch(() => {});
+  }, []);
 
   return (
     <div className="min-h-screen bg-white font-sans text-gray-800 overflow-x-hidden">
@@ -181,6 +206,58 @@ export default function InfoPage() {
           </div>
         </div>
       </section>
+
+      {/* Community preview */}
+      {previewDishes.length > 0 && (
+        <section className="py-24 px-6">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-4">
+                {T.infoCommunityH2}
+              </h2>
+              <p className="text-gray-500 text-lg max-w-xl mx-auto">{T.infoCommunityDesc}</p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+              {previewDishes.map(dish => {
+                const gradient = CATEGORY_GRADIENTS[dish.category] ?? 'from-gray-200 to-gray-400';
+                return (
+                  <div key={dish.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-md hover:-translate-y-0.5 transition-all">
+                    {dish.image ? (
+                      <img
+                        src={`/uploads/${dish.image}`}
+                        alt={dish.name}
+                        className="w-full aspect-[4/3] object-cover"
+                      />
+                    ) : (
+                      <div className={`w-full aspect-[4/3] bg-gradient-to-br ${gradient} flex items-center justify-center`}>
+                        <UtensilsCrossed size={36} className="text-white/60" />
+                      </div>
+                    )}
+                    <div className="p-4">
+                      <h3 className="font-bold text-gray-800 text-sm leading-tight truncate">{dish.name}</h3>
+                      <p className="text-xs text-gray-400 mt-0.5 truncate">{T.byLabel} {dish.household_name}</p>
+                      {dish.description && (
+                        <p className="text-xs text-gray-500 mt-1.5 line-clamp-2 leading-relaxed">{dish.description}</p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="text-center mt-10">
+              <Link
+                to="/register"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-2xl transition-all shadow-md shadow-amber-200 text-sm"
+              >
+                <Sparkles size={15} />
+                {T.infoBrowseCommunity}
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* How it works */}
       <section id="how-it-works" className="py-24 px-6">
