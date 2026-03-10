@@ -1,4 +1,4 @@
-import { Pencil, Trash2, Moon, Check, Users } from 'lucide-react';
+import { Pencil, Trash2, Moon, Check, Users, MapPin } from 'lucide-react';
 import type { Dish } from '../lib/types';
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -8,6 +8,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   Dessert: 'bg-pink-100 text-pink-700',
   Drink: 'bg-purple-100 text-purple-700',
   Snack: 'bg-orange-100 text-orange-700',
+  Takeout: 'bg-red-100 text-red-700',
 };
 
 interface Props {
@@ -20,6 +21,7 @@ interface Props {
 
 export default function DishCard({ dish, isTonight, onToggleTonight, onEdit, onDelete }: Props) {
   const colorClass = CATEGORY_COLORS[dish.category] ?? 'bg-gray-100 text-gray-700';
+  const isTakeout = dish.category === 'Takeout';
 
   return (
     <div className={`bg-white rounded-xl border-2 transition-all shadow-sm hover:shadow-md overflow-hidden ${isTonight ? 'border-amber-400' : 'border-transparent'}`}>
@@ -39,15 +41,24 @@ export default function DishCard({ dish, isTonight, onToggleTonight, onEdit, onD
         </div>
 
         {dish.description && (
-          <p className="text-sm text-gray-500 mb-3 line-clamp-2">{dish.description}</p>
+          <p className="text-sm text-gray-500 mb-3 line-clamp-2">
+            {isTakeout && <MapPin size={12} className="inline mr-1 -mt-0.5" />}
+            {dish.description}
+          </p>
         )}
 
         <div className="flex items-center gap-3 text-xs text-gray-400 mb-3">
-          <span className="flex items-center gap-1">
-            <Users size={12} />
-            {dish.servings} servings
-          </span>
-          <span>{dish.ingredients.length} ingredient{dish.ingredients.length !== 1 ? 's' : ''}</span>
+          {isTakeout ? (
+            <span>{dish.ingredients.length} menu item{dish.ingredients.length !== 1 ? 's' : ''}</span>
+          ) : (
+            <>
+              <span className="flex items-center gap-1">
+                <Users size={12} />
+                {dish.servings} servings
+              </span>
+              <span>{dish.ingredients.length} ingredient{dish.ingredients.length !== 1 ? 's' : ''}</span>
+            </>
+          )}
         </div>
 
         {dish.ingredients.length > 0 && (
@@ -55,7 +66,7 @@ export default function DishCard({ dish, isTonight, onToggleTonight, onEdit, onD
             <ul className="space-y-1">
               {dish.ingredients.slice(0, 4).map((ing) => (
                 <li key={ing.id} className="text-xs text-gray-600 flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
+                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isTakeout ? 'bg-red-400' : 'bg-amber-400'}`} />
                   <span className="font-medium">{ing.name}</span>
                   {(ing.quantity || ing.unit) && (
                     <span className="text-gray-400">
