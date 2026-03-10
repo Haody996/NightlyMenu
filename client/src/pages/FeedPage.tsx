@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { Sparkles, UtensilsCrossed } from 'lucide-react';
-import api from '../lib/api';
+import api, { uploadsBase } from '../lib/api';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface FeedIngredient {
@@ -72,7 +72,7 @@ function DishPost({ dish }: { dish: FeedDish }) {
     <article className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
       {dish.image ? (
         <img
-          src={`/uploads/${dish.image}`}
+          src={`${uploadsBase}/${dish.image}`}
           alt={dish.name}
           className="w-full aspect-[4/3] object-cover"
         />

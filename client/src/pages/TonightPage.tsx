@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { X, ShoppingBasket, Moon, Users, LogIn, Send } from 'lucide-react';
-import api from '../lib/api';
+import api, { uploadsBase } from '../lib/api';
 import type { Dish, Ingredient, MealPlan } from '../lib/types';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -117,7 +117,7 @@ export default function TonightPage() {
             {dishes.map((dish) => (
               <div key={dish.id} className="bg-white rounded-xl border border-amber-200 shadow-sm overflow-hidden">
                 {dish.image && (
-                  <img src={`/uploads/${dish.image}`} alt={dish.name} className="w-full h-44 object-cover" />
+                  <img src={`${uploadsBase}/${dish.image}`} alt={dish.name} className="w-full h-44 object-cover" />
                 )}
                 <div className="p-4">
                 <div className="flex items-start justify-between gap-2 mb-3">

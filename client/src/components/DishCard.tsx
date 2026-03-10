@@ -1,6 +1,7 @@
 import { Pencil, Trash2, Moon, Check, Users, MapPin } from 'lucide-react';
 import type { Dish } from '../lib/types';
 import { useLanguage } from '../contexts/LanguageContext';
+import { uploadsBase } from '../lib/api';
 
 const CATEGORY_COLORS: Record<string, string> = {
   Starter: 'bg-green-100 text-green-700',
@@ -29,7 +30,7 @@ export default function DishCard({ dish, isTonight, onToggleTonight, onEdit, onD
     <div className={`bg-white rounded-xl border-2 transition-all shadow-sm hover:shadow-md overflow-hidden ${isTonight ? 'border-amber-400' : 'border-transparent'}`}>
       {dish.image && (
         <img
-          src={`/uploads/${dish.image}`}
+          src={`${uploadsBase}/${dish.image}`}
           alt={dish.name}
           className="w-full h-40 object-cover"
         />

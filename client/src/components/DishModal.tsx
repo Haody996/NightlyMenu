@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { X, Plus, Trash2, ImagePlus, Trash } from 'lucide-react';
 import type { Dish, Ingredient } from '../lib/types';
 import { useLanguage } from '../contexts/LanguageContext';
+import { uploadsBase } from '../lib/api';
 
 interface IngredientDraft {
   name: string;
@@ -99,7 +100,7 @@ export default function DishModal({ dish, onSave, onClose, saving, serverError }
 
   const isTakeout = category === 'Takeout';
 
-  const currentImageUrl = dish?.image ? `/uploads/${dish.image}` : null;
+  const currentImageUrl = dish?.image ? `${uploadsBase}/${dish.image}` : null;
   const displayImage = imagePreview ?? (imageFile === null ? null : currentImageUrl);
 
   return (
