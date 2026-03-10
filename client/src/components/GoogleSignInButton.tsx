@@ -4,11 +4,16 @@ import { useNavigate } from 'react-router-dom';
 import api from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 
+// Capacitor sets window.Capacitor when running as a native app
+const isNative = !!(window as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor?.isNativePlatform?.();
+
 export default function GoogleSignInButton() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(400);
+
+  if (isNative) return null;
 
   useEffect(() => {
     if (!wrapperRef.current) return;

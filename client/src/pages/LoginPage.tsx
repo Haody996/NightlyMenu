@@ -6,6 +6,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import GoogleSignInButton from '../components/GoogleSignInButton';
 
+const isNative = !!(window as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor?.isNativePlatform?.();
+
 export default function LoginPage() {
   const { login } = useAuth();
   const { T } = useLanguage();
@@ -48,11 +50,13 @@ export default function LoginPage() {
 
         <GoogleSignInButton />
 
-        <div className="flex items-center gap-3 my-5">
-          <div className="flex-1 h-px bg-gray-200" />
-          <span className="text-xs text-gray-400">{T.or}</span>
-          <div className="flex-1 h-px bg-gray-200" />
-        </div>
+        {!isNative && (
+          <div className="flex items-center gap-3 my-5">
+            <div className="flex-1 h-px bg-gray-200" />
+            <span className="text-xs text-gray-400">{T.or}</span>
+            <div className="flex-1 h-px bg-gray-200" />
+          </div>
+        )}
 
         {error && (
           <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2 mb-4">
