@@ -23,7 +23,7 @@ interface Props {
   serverError?: string;
 }
 
-const CATEGORIES = ['Starter', 'Main', 'Side', 'Dessert', 'Drink', 'Snack'];
+const CATEGORIES = ['Starter', 'Main', 'Side', 'Dessert', 'Drink', 'Snack', 'Takeout'];
 const UNITS = ['', 'g', 'kg', 'oz', 'lbs', 'ml', 'L', 'tsp', 'tbsp', 'cup', 'pieces', 'slices', 'cans', 'bunches', 'cloves'];
 
 function toIngredientDraft(ing: Ingredient): IngredientDraft {
@@ -96,6 +96,8 @@ export default function DishModal({ dish, onSave, onClose, saving, serverError }
     onSave({ name: name.trim(), description, category, servings, ingredients: validIngredients, imageFile });
   }
 
+  const isTakeout = category === 'Takeout';
+
   // Determine what image to show in the preview area
   const currentImageUrl = dish?.image ? `/uploads/${dish.image}` : null;
   const displayImage = imagePreview ?? (imageFile === null ? null : currentImageUrl);
@@ -105,7 +107,7 @@ export default function DishModal({ dish, onSave, onClose, saving, serverError }
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <h2 className="text-lg font-semibold text-gray-800">
-            {dish ? 'Edit Dish' : 'Add New Dish'}
+            {dish ? (isTakeout ? 'Edit Restaurant' : 'Edit Dish') : (isTakeout ? 'Add Restaurant' : 'Add New Dish')}
           </h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
             <X size={20} />
@@ -163,28 +165,28 @@ export default function DishModal({ dish, onSave, onClose, saving, serverError }
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Dish Name *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{isTakeout ? 'Restaurant Name' : 'Dish Name'} *</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Spaghetti Bolognese"
+              placeholder={isTakeout ? 'e.g. Thai Palace' : 'e.g. Spaghetti Bolognese'}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{isTakeout ? 'Address / Notes' : 'Description'}</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Optional description..."
+              placeholder={isTakeout ? 'Address, phone, or notes...' : 'Optional description...'}
               rows={2}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className={`grid gap-4 ${isTakeout ? 'grid-cols-1' : 'grid-cols-2'}`}>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
               <select
@@ -199,29 +201,34 @@ export default function DishModal({ dish, onSave, onClose, saving, serverError }
                 ))}
               </select>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Servings</label>
-              <input
-                type="number"
-                min={1}
-                max={20}
-                value={servings}
-                onChange={(e) => setServings(Number(e.target.value))}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-              />
-            </div>
+            {!isTakeout && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Servings</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={20}
+                  value={servings}
+                  onChange={(e) => setServings(Number(e.target.value))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                />
+              </div>
+            )}
           </div>
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium text-gray-700">Ingredients <span className="text-gray-400 font-normal">(recommended)</span></label>
+              <label className="text-sm font-medium text-gray-700">
+                {isTakeout ? 'Menu Items' : 'Ingredients'}{' '}
+                <span className="text-gray-400 font-normal">({isTakeout ? 'your go-to dishes' : 'recommended'})</span>
+              </label>
               <button
                 type="button"
                 onClick={addIngredient}
                 className="flex items-center gap-1 text-xs text-amber-600 hover:text-amber-800 font-medium"
               >
                 <Plus size={14} />
-                Add ingredient
+                {isTakeout ? 'Add item' : 'Add ingredient'}
               </button>
             </div>
             <div className="space-y-2">
@@ -231,25 +238,37 @@ export default function DishModal({ dish, onSave, onClose, saving, serverError }
                     type="text"
                     value={ing.name}
                     onChange={(e) => updateIngredient(i, 'name', e.target.value)}
-                    placeholder="Ingredient"
+                    placeholder={isTakeout ? 'e.g. Pad Thai' : 'Ingredient'}
                     className="flex-1 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
                   />
-                  <input
-                    type="text"
-                    value={ing.quantity}
-                    onChange={(e) => updateIngredient(i, 'quantity', e.target.value)}
-                    placeholder="Qty"
-                    className="w-16 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-                  />
-                  <select
-                    value={ing.unit}
-                    onChange={(e) => updateIngredient(i, 'unit', e.target.value)}
-                    className="w-24 border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-                  >
-                    {UNITS.map((u) => (
-                      <option key={u} value={u}>{u}</option>
-                    ))}
-                  </select>
+                  {isTakeout ? (
+                    <input
+                      type="text"
+                      value={ing.quantity}
+                      onChange={(e) => updateIngredient(i, 'quantity', e.target.value)}
+                      placeholder="Price"
+                      className="w-20 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                    />
+                  ) : (
+                    <>
+                      <input
+                        type="text"
+                        value={ing.quantity}
+                        onChange={(e) => updateIngredient(i, 'quantity', e.target.value)}
+                        placeholder="Qty"
+                        className="w-16 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                      />
+                      <select
+                        value={ing.unit}
+                        onChange={(e) => updateIngredient(i, 'unit', e.target.value)}
+                        className="w-24 border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                      >
+                        {UNITS.map((u) => (
+                          <option key={u} value={u}>{u}</option>
+                        ))}
+                      </select>
+                    </>
+                  )}
                   {ingredients.length > 1 && (
                     <button
                       type="button"
@@ -277,7 +296,7 @@ export default function DishModal({ dish, onSave, onClose, saving, serverError }
               disabled={saving}
               className="flex-1 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg py-2.5 text-sm font-medium transition-colors"
             >
-              {saving ? 'Saving...' : dish ? 'Save Changes' : 'Add Dish'}
+              {saving ? 'Saving...' : dish ? 'Save Changes' : isTakeout ? 'Add Restaurant' : 'Add Dish'}
             </button>
           </div>
         </form>
