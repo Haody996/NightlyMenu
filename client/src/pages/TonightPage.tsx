@@ -5,6 +5,7 @@ import { X, ShoppingBasket, Moon, Users, LogIn, Send } from 'lucide-react';
 import api from '../lib/api';
 import type { Dish, Ingredient, MealPlan } from '../lib/types';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 
 async function fetchTonight(): Promise<MealPlan> {
   const res = await api.get('/meal-plan/tonight');
@@ -18,6 +19,7 @@ function formatIngredient(ing: Ingredient): string {
 
 export default function TonightPage() {
   const { user, household } = useAuth();
+  const { T } = useLanguage();
   const qc = useQueryClient();
   const [notifySent, setNotifySent] = useState(false);
 
@@ -42,13 +44,13 @@ export default function TonightPage() {
     return (
       <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-amber-300">
         <Moon size={40} className="mx-auto text-amber-300 mb-3" />
-        <p className="text-gray-500 mb-4">Sign in to plan tonight's dinner with your household.</p>
+        <p className="text-gray-500 mb-4">{T.signInTonight}</p>
         <div className="flex gap-3 justify-center">
           <Link to="/register" className="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-xl transition-colors">
-            Get started
+            {T.getStarted}
           </Link>
           <Link to="/login" className="flex items-center gap-1.5 px-5 py-2.5 border border-gray-300 text-gray-600 text-sm font-medium rounded-xl transition-colors">
-            <LogIn size={14} />Sign in
+            <LogIn size={14} />{T.signIn}
           </Link>
         </div>
       </div>
@@ -58,16 +60,16 @@ export default function TonightPage() {
   if (!household) {
     return (
       <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-amber-300">
-        <p className="text-gray-500 mb-3">You need a household to plan tonight's meal.</p>
+        <p className="text-gray-500 mb-3">{T.noHouseholdTonight}</p>
         <Link to="/household" className="text-amber-600 hover:text-amber-700 text-sm font-medium">
-          Set up your household →
+          {T.setupHousehold}
         </Link>
       </div>
     );
   }
 
   if (isLoading) {
-    return <div className="text-center text-gray-400 py-20">Loading...</div>;
+    return <div className="text-center text-gray-400 py-20">{T.loading}</div>;
   }
 
   const dishes: Dish[] = data?.dishes ?? [];
@@ -79,10 +81,10 @@ export default function TonightPage() {
       <div className="flex items-center gap-3 mb-6">
         <Moon size={22} className="text-amber-500" />
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-gray-800">Tonight's Menu</h1>
+          <h1 className="text-2xl font-bold text-gray-800">{T.tonightTitle}</h1>
           <p className="text-sm text-gray-500 mt-0.5">
-            {data?.date} &middot; {dishes.length} dish{dishes.length !== 1 ? 'es' : ''}
-            {totalServings > 0 && ` · ${totalServings} total servings`}
+            {data?.date} &middot; {T.dishCount(dishes.length)}
+            {totalServings > 0 && ` ${T.totalServings(totalServings)}`}
           </p>
         </div>
         {dishes.length > 0 && (
@@ -96,7 +98,7 @@ export default function TonightPage() {
             }`}
           >
             <Send size={14} />
-            {notifySent ? 'Notified!' : notifyMutation.isPending ? 'Sending…' : 'Notify household'}
+            {notifySent ? T.notified : notifyMutation.isPending ? T.sending : T.notifyHousehold}
           </button>
         )}
       </div>
@@ -104,9 +106,9 @@ export default function TonightPage() {
       {dishes.length === 0 ? (
         <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-amber-300">
           <Moon size={40} className="mx-auto text-amber-300 mb-3" />
-          <p className="text-gray-500 mb-1">Nothing planned for tonight yet.</p>
+          <p className="text-gray-500 mb-1">{T.nothingPlanned}</p>
           <Link to="/" className="text-amber-600 hover:text-amber-700 text-sm font-medium">
-            Browse the menu and add some dishes
+            {T.browseMenu}
           </Link>
         </div>
       ) : (
@@ -122,17 +124,19 @@ export default function TonightPage() {
                   <div>
                     <h3 className="font-semibold text-gray-800">{dish.name}</h3>
                     <div className="flex items-center gap-2 mt-0.5 text-xs text-gray-400">
-                      <span className="px-2 py-0.5 bg-amber-50 text-amber-700 rounded-full">{dish.category}</span>
+                      <span className="px-2 py-0.5 bg-amber-50 text-amber-700 rounded-full">
+                        {T.categories[dish.category] ?? dish.category}
+                      </span>
                       <span className="flex items-center gap-1">
                         <Users size={11} />
-                        {dish.servings} servings
+                        {dish.servings} {T.servings}
                       </span>
                     </div>
                   </div>
                   <button
                     onClick={() => removeMutation.mutate(dish.id)}
                     className="text-gray-300 hover:text-red-400 transition-colors p-1"
-                    title="Remove from tonight"
+                    title={T.removeFromTonight}
                   >
                     <X size={16} />
                   </button>
@@ -154,7 +158,7 @@ export default function TonightPage() {
           <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm h-fit">
             <div className="flex items-center gap-2 mb-4">
               <ShoppingBasket size={18} className="text-amber-500" />
-              <h2 className="font-semibold text-gray-700 text-sm">All Ingredients</h2>
+              <h2 className="font-semibold text-gray-700 text-sm">{T.allIngredients}</h2>
               <span className="ml-auto text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
                 {allIngredients.length}
               </span>

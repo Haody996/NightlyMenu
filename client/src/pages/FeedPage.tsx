@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { Sparkles, UtensilsCrossed } from 'lucide-react';
 import api from '../lib/api';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface FeedIngredient {
   name: string;
@@ -63,12 +64,12 @@ function timeAgo(dateStr: string): string {
 }
 
 function DishPost({ dish }: { dish: FeedDish }) {
+  const { T } = useLanguage();
   const colorClass = CATEGORY_COLORS[dish.category] ?? 'bg-gray-100 text-gray-700';
   const gradient = CATEGORY_GRADIENTS[dish.category] ?? 'from-gray-200 to-gray-400';
 
   return (
     <article className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-      {/* Image or gradient placeholder */}
       {dish.image ? (
         <img
           src={`/uploads/${dish.image}`}
@@ -82,32 +83,31 @@ function DishPost({ dish }: { dish: FeedDish }) {
       )}
 
       <div className="p-5">
-        {/* Header */}
         <div className="flex items-start justify-between gap-2 mb-3">
           <div>
             <h2 className="font-bold text-gray-900 text-lg leading-tight">{dish.name}</h2>
             <p className="text-xs text-gray-400 mt-0.5">
-              by <span className="text-gray-500 font-medium">{dish.household_name}</span>
+              {T.byLabel} <span className="text-gray-500 font-medium">{dish.household_name}</span>
               {' · '}{timeAgo(dish.created_at)}
             </p>
           </div>
           <div className="flex flex-col items-end gap-1.5 shrink-0">
             <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${colorClass}`}>
-              {dish.category}
+              {T.categories[dish.category] ?? dish.category}
             </span>
-            <span className="text-xs text-gray-400">{dish.servings} servings</span>
+            <span className="text-xs text-gray-400">{dish.servings} {T.servings}</span>
           </div>
         </div>
 
-        {/* Description */}
         {dish.description && (
           <p className="text-sm text-gray-600 mb-4 leading-relaxed">{dish.description}</p>
         )}
 
-        {/* Ingredients */}
         {dish.ingredients.length > 0 && (
           <div>
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Ingredients</p>
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+              {T.ingredientsSectionTitle}
+            </p>
             <div className="flex flex-wrap gap-1.5">
               {dish.ingredients.map((ing, i) => (
                 <span
@@ -131,6 +131,7 @@ function DishPost({ dish }: { dish: FeedDish }) {
 }
 
 export default function FeedPage() {
+  const { T } = useLanguage();
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery({
@@ -140,7 +141,6 @@ export default function FeedPage() {
     getNextPageParam: (lastPage) => lastPage.nextCursor,
   });
 
-  // Intersection observer for infinite scroll
   useEffect(() => {
     const el = sentinelRef.current;
     if (!el) return;
@@ -161,8 +161,8 @@ export default function FeedPage() {
       <div className="flex items-center gap-3 mb-8">
         <Sparkles size={22} className="text-amber-500" />
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Community Feed</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Dishes shared by all households</p>
+          <h1 className="text-2xl font-bold text-gray-800">{T.communityFeed}</h1>
+          <p className="text-sm text-gray-500 mt-0.5">{T.feedSubtitle}</p>
         </div>
       </div>
 
@@ -185,8 +185,8 @@ export default function FeedPage() {
       {!isLoading && dishes.length === 0 && (
         <div className="text-center py-24">
           <UtensilsCrossed size={48} className="mx-auto text-amber-200 mb-4" />
-          <p className="text-gray-500 font-medium">No dishes yet</p>
-          <p className="text-sm text-gray-400 mt-1">Be the first to add a dish to your household!</p>
+          <p className="text-gray-500 font-medium">{T.noDishesYet}</p>
+          <p className="text-sm text-gray-400 mt-1">{T.beFirstToAdd}</p>
         </div>
       )}
 
@@ -196,7 +196,6 @@ export default function FeedPage() {
         ))}
       </div>
 
-      {/* Infinite scroll sentinel */}
       <div ref={sentinelRef} className="py-6 text-center">
         {isFetchingNextPage && (
           <div className="flex justify-center gap-1.5">
@@ -210,7 +209,7 @@ export default function FeedPage() {
           </div>
         )}
         {!hasNextPage && dishes.length > 0 && (
-          <p className="text-xs text-gray-300">You've seen it all ✦</p>
+          <p className="text-xs text-gray-300">{T.seenAll}</p>
         )}
       </div>
     </div>

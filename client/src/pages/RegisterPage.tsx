@@ -3,10 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { UtensilsCrossed } from 'lucide-react';
 import api from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import GoogleSignInButton from '../components/GoogleSignInButton';
 
 export default function RegisterPage() {
   const { login } = useAuth();
+  const { T } = useLanguage();
   const navigate = useNavigate();
   const [name, setName]         = useState('');
   const [email, setEmail]       = useState('');
@@ -18,7 +20,7 @@ export default function RegisterPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
-    if (password !== confirm) { setError('Passwords do not match'); return; }
+    if (password !== confirm) { setError(T.passwordsNoMatch); return; }
     setLoading(true);
     try {
       const res = await api.post('/auth/register', { name, email, password });
@@ -26,7 +28,7 @@ export default function RegisterPage() {
       navigate('/household');
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { error?: string } } })
-        ?.response?.data?.error ?? 'Registration failed';
+        ?.response?.data?.error ?? T.registrationFailed;
       setError(msg);
     } finally {
       setLoading(false);
@@ -41,13 +43,13 @@ export default function RegisterPage() {
           Dinnerly
         </div>
 
-        <h1 className="text-xl font-semibold text-gray-800 mb-6 text-center">Create account</h1>
+        <h1 className="text-xl font-semibold text-gray-800 mb-6 text-center">{T.createAccount}</h1>
 
         <GoogleSignInButton />
 
         <div className="flex items-center gap-3 my-5">
           <div className="flex-1 h-px bg-gray-200" />
-          <span className="text-xs text-gray-400">or</span>
+          <span className="text-xs text-gray-400">{T.or}</span>
           <div className="flex-1 h-px bg-gray-200" />
         </div>
 
@@ -59,16 +61,16 @@ export default function RegisterPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{T.nameLabel}</label>
             <input
               type="text" required value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Your name"
+              placeholder={T.yourNamePlaceholder}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{T.emailLabel}</label>
             <input
               type="email" required value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -76,16 +78,16 @@ export default function RegisterPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{T.passwordLabel}</label>
             <input
               type="password" required minLength={8} value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Min. 8 characters"
+              placeholder={T.minPasswordHint}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{T.confirmPassword}</label>
             <input
               type="password" required value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
@@ -96,14 +98,14 @@ export default function RegisterPage() {
             type="submit" disabled={loading}
             className="w-full bg-amber-500 hover:bg-amber-600 text-white rounded-lg py-2.5 text-sm font-medium transition-colors disabled:opacity-60"
           >
-            {loading ? 'Creating account...' : 'Create account'}
+            {loading ? T.creatingAccount : T.createAccount}
           </button>
         </form>
 
         <p className="text-center text-sm text-gray-500 mt-6">
-          Already have an account?{' '}
+          {T.alreadyHaveAccount}{' '}
           <Link to="/login" className="text-amber-600 hover:text-amber-700 font-medium">
-            Sign in
+            {T.signIn}
           </Link>
         </p>
       </div>

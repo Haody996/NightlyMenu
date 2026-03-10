@@ -3,10 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { UtensilsCrossed } from 'lucide-react';
 import api from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import GoogleSignInButton from '../components/GoogleSignInButton';
 
 export default function LoginPage() {
   const { login } = useAuth();
+  const { T } = useLanguage();
   const navigate = useNavigate();
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
@@ -27,7 +29,7 @@ export default function LoginPage() {
       navigate(meRes.data.household ? '/' : '/household');
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { error?: string } } })
-        ?.response?.data?.error ?? 'Login failed';
+        ?.response?.data?.error ?? T.loginFailed;
       setError(msg);
     } finally {
       setLoading(false);
@@ -42,13 +44,13 @@ export default function LoginPage() {
           Dinnerly
         </div>
 
-        <h1 className="text-xl font-semibold text-gray-800 mb-6 text-center">Sign in</h1>
+        <h1 className="text-xl font-semibold text-gray-800 mb-6 text-center">{T.signInHeading}</h1>
 
         <GoogleSignInButton />
 
         <div className="flex items-center gap-3 my-5">
           <div className="flex-1 h-px bg-gray-200" />
-          <span className="text-xs text-gray-400">or</span>
+          <span className="text-xs text-gray-400">{T.or}</span>
           <div className="flex-1 h-px bg-gray-200" />
         </div>
 
@@ -60,7 +62,7 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{T.emailLabel}</label>
             <input
               type="email" required value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -68,7 +70,7 @@ export default function LoginPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{T.passwordLabel}</label>
             <input
               type="password" required value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -79,14 +81,14 @@ export default function LoginPage() {
             type="submit" disabled={loading}
             className="w-full bg-amber-500 hover:bg-amber-600 text-white rounded-lg py-2.5 text-sm font-medium transition-colors disabled:opacity-60"
           >
-            {loading ? 'Signing in...' : 'Sign in'}
+            {loading ? T.signingIn : T.signInHeading}
           </button>
         </form>
 
         <p className="text-center text-sm text-gray-500 mt-6">
-          No account?{' '}
+          {T.noAccount}{' '}
           <Link to="/register" className="text-amber-600 hover:text-amber-700 font-medium">
-            Register
+            {T.register}
           </Link>
         </p>
       </div>

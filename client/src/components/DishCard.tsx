@@ -1,5 +1,6 @@
 import { Pencil, Trash2, Moon, Check, Users, MapPin } from 'lucide-react';
 import type { Dish } from '../lib/types';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const CATEGORY_COLORS: Record<string, string> = {
   Starter: 'bg-green-100 text-green-700',
@@ -20,6 +21,7 @@ interface Props {
 }
 
 export default function DishCard({ dish, isTonight, onToggleTonight, onEdit, onDelete }: Props) {
+  const { T } = useLanguage();
   const colorClass = CATEGORY_COLORS[dish.category] ?? 'bg-gray-100 text-gray-700';
   const isTakeout = dish.category === 'Takeout';
 
@@ -36,7 +38,7 @@ export default function DishCard({ dish, isTonight, onToggleTonight, onEdit, onD
         <div className="flex items-start justify-between gap-2 mb-2">
           <h3 className="font-semibold text-gray-800 leading-tight">{dish.name}</h3>
           <span className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${colorClass}`}>
-            {dish.category}
+            {T.categories[dish.category] ?? dish.category}
           </span>
         </div>
 
@@ -49,14 +51,14 @@ export default function DishCard({ dish, isTonight, onToggleTonight, onEdit, onD
 
         <div className="flex items-center gap-3 text-xs text-gray-400 mb-3">
           {isTakeout ? (
-            <span>{dish.ingredients.length} menu item{dish.ingredients.length !== 1 ? 's' : ''}</span>
+            <span>{T.menuItemsCount(dish.ingredients.length)}</span>
           ) : (
             <>
               <span className="flex items-center gap-1">
                 <Users size={12} />
-                {dish.servings} servings
+                {dish.servings} {T.servings}
               </span>
-              <span>{dish.ingredients.length} ingredient{dish.ingredients.length !== 1 ? 's' : ''}</span>
+              <span>{T.ingredientsCount(dish.ingredients.length)}</span>
             </>
           )}
         </div>
@@ -77,7 +79,7 @@ export default function DishCard({ dish, isTonight, onToggleTonight, onEdit, onD
               ))}
               {dish.ingredients.length > 4 && (
                 <li className="text-xs text-gray-400 pl-3">
-                  +{dish.ingredients.length - 4} more
+                  {T.moreItems(dish.ingredients.length - 4)}
                 </li>
               )}
             </ul>
@@ -94,19 +96,19 @@ export default function DishCard({ dish, isTonight, onToggleTonight, onEdit, onD
             }`}
           >
             {isTonight ? <Check size={14} /> : <Moon size={14} />}
-            {isTonight ? 'On Tonight\'s Menu' : 'Add to Tonight'}
+            {isTonight ? T.onTonightsMenu : T.addToTonight}
           </button>
           <button
             onClick={onEdit}
             className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
-            title="Edit dish"
+            title={T.editDishTooltip}
           >
             <Pencil size={15} />
           </button>
           <button
             onClick={onDelete}
             className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-            title="Delete dish"
+            title={T.deleteDishTooltip}
           >
             <Trash2 size={15} />
           </button>

@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, NavLink, Navigate, Link } from 'react-router-dom';
 import { UtensilsCrossed, ShoppingCart, Home, LogOut, LogIn, Sparkles, BookOpen } from 'lucide-react';
 import { useAuth } from './contexts/AuthContext';
+import { useLanguage } from './contexts/LanguageContext';
 import MenuPage      from './pages/MenuPage';
 import TonightPage   from './pages/TonightPage';
 import FeedPage      from './pages/FeedPage';
@@ -10,9 +11,10 @@ import HouseholdPage from './pages/HouseholdPage';
 import InfoPage      from './pages/InfoPage';
 
 function Spinner() {
+  const { T } = useLanguage();
   return (
     <div className="min-h-screen bg-amber-50 flex items-center justify-center text-gray-400">
-      Loading...
+      {T.loading}
     </div>
   );
 }
@@ -34,8 +36,22 @@ function AuthedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function LangToggle() {
+  const { lang, setLang } = useLanguage();
+  return (
+    <button
+      onClick={() => setLang(lang === 'en' ? 'zh' : 'en')}
+      className="px-2 py-1.5 text-xs font-medium text-gray-500 hover:text-amber-700 border border-gray-200 hover:border-amber-300 rounded-lg transition-colors min-w-[34px] text-center"
+      title={lang === 'en' ? 'Switch to Chinese' : '切换为英文'}
+    >
+      {lang === 'en' ? '中文' : 'EN'}
+    </button>
+  );
+}
+
 function Layout({ children }: { children: React.ReactNode }) {
   const { user, household, logout, isLoading } = useAuth();
+  const { T } = useLanguage();
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
     `flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
@@ -53,62 +69,65 @@ function Layout({ children }: { children: React.ReactNode }) {
               Dinnerly
             </Link>
 
-            {!isLoading && (
-              <div className="flex items-center gap-1.5">
-                {user ? (
-                  <>
-                    <NavLink
-                      to="/household"
-                      className={({ isActive }) =>
-                        `flex items-center gap-1.5 px-2 sm:px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                          isActive ? 'bg-amber-100 text-amber-800' : 'text-gray-500 hover:text-amber-700 hover:bg-amber-50'
-                        }`
-                      }
-                    >
-                      <Home size={15} />
-                      <span className="hidden sm:block">{household?.name ?? 'Household'}</span>
-                    </NavLink>
-                    <span className="text-sm text-gray-400 hidden md:block">{user.name}</span>
-                    <button
-                      onClick={logout}
-                      className="flex items-center gap-1.5 px-2 sm:px-3 py-2 text-sm text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                      title="Sign out"
-                    >
-                      <LogOut size={15} />
-                      <span className="hidden sm:block">Sign out</span>
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <Link
-                      to="/login"
-                      className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-colors font-medium"
-                    >
-                      <LogIn size={15} />
-                      <span className="hidden sm:block">Sign in</span>
-                    </Link>
-                    <Link
-                      to="/register"
-                      className="px-3 sm:px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-lg transition-colors"
-                    >
-                      Register
-                    </Link>
-                  </>
-                )}
-              </div>
-            )}
+            <div className="flex items-center gap-1.5">
+              <LangToggle />
+              {!isLoading && (
+                <>
+                  {user ? (
+                    <>
+                      <NavLink
+                        to="/household"
+                        className={({ isActive }) =>
+                          `flex items-center gap-1.5 px-2 sm:px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                            isActive ? 'bg-amber-100 text-amber-800' : 'text-gray-500 hover:text-amber-700 hover:bg-amber-50'
+                          }`
+                        }
+                      >
+                        <Home size={15} />
+                        <span className="hidden sm:block">{household?.name ?? T.household}</span>
+                      </NavLink>
+                      <span className="text-sm text-gray-400 hidden md:block">{user.name}</span>
+                      <button
+                        onClick={logout}
+                        className="flex items-center gap-1.5 px-2 sm:px-3 py-2 text-sm text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        title={T.signOut}
+                      >
+                        <LogOut size={15} />
+                        <span className="hidden sm:block">{T.signOut}</span>
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        to="/login"
+                        className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-colors font-medium"
+                      >
+                        <LogIn size={15} />
+                        <span className="hidden sm:block">{T.signIn}</span>
+                      </Link>
+                      <Link
+                        to="/register"
+                        className="px-3 sm:px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-lg transition-colors"
+                      >
+                        {T.register}
+                      </Link>
+                    </>
+                  )}
+                </>
+              )}
+            </div>
           </div>
 
           {/* Bottom row: nav links — scrollable on mobile */}
           <nav className="flex gap-1 overflow-x-auto pb-1 -mb-px scrollbar-hide">
             <NavLink to="/" end className={navLinkClass}>
-              <BookOpen size={14} />Menu
+              <BookOpen size={14} />{T.menu}
             </NavLink>
             <NavLink to="/tonight" className={navLinkClass}>
-              <ShoppingCart size={14} />Tonight
+              <ShoppingCart size={14} />{T.tonight}
             </NavLink>
             <NavLink to="/feed" className={navLinkClass}>
-              <Sparkles size={14} />Community
+              <Sparkles size={14} />{T.community}
             </NavLink>
           </nav>
         </div>

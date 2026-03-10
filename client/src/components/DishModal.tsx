@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, Plus, Trash2, ImagePlus, Trash } from 'lucide-react';
 import type { Dish, Ingredient } from '../lib/types';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface IngredientDraft {
   name: string;
@@ -31,6 +32,7 @@ function toIngredientDraft(ing: Ingredient): IngredientDraft {
 }
 
 export default function DishModal({ dish, onSave, onClose, saving, serverError }: Props) {
+  const { T } = useLanguage();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('Main');
@@ -39,7 +41,6 @@ export default function DishModal({ dish, onSave, onClose, saving, serverError }
     { name: '', quantity: '', unit: '' },
   ]);
   const [error, setError] = useState('');
-  // imageFile: undefined = no change, File = new upload, null = remove existing
   const [imageFile, setImageFile] = useState<File | null | undefined>(undefined);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -89,7 +90,7 @@ export default function DishModal({ dish, onSave, onClose, saving, serverError }
     e.preventDefault();
     setError('');
     if (!name.trim()) {
-      setError('Dish name is required.');
+      setError(T.dishNameRequired);
       return;
     }
     const validIngredients = ingredients.filter((i) => i.name.trim());
@@ -98,7 +99,6 @@ export default function DishModal({ dish, onSave, onClose, saving, serverError }
 
   const isTakeout = category === 'Takeout';
 
-  // Determine what image to show in the preview area
   const currentImageUrl = dish?.image ? `/uploads/${dish.image}` : null;
   const displayImage = imagePreview ?? (imageFile === null ? null : currentImageUrl);
 
@@ -107,7 +107,9 @@ export default function DishModal({ dish, onSave, onClose, saving, serverError }
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <h2 className="text-lg font-semibold text-gray-800">
-            {dish ? (isTakeout ? 'Edit Restaurant' : 'Edit Dish') : (isTakeout ? 'Add Restaurant' : 'Add New Dish')}
+            {dish
+              ? (isTakeout ? T.editRestaurant : T.editDish)
+              : (isTakeout ? T.addRestaurant : T.addNewDish)}
           </h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
             <X size={20} />
@@ -123,7 +125,9 @@ export default function DishModal({ dish, onSave, onClose, saving, serverError }
 
           {/* Photo */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Photo <span className="text-gray-400 font-normal">(optional)</span></label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {T.photo} <span className="text-gray-400 font-normal">({T.optional})</span>
+            </label>
             <input
               ref={fileInputRef}
               type="file"
@@ -140,13 +144,13 @@ export default function DishModal({ dish, onSave, onClose, saving, serverError }
                     onClick={() => fileInputRef.current?.click()}
                     className="bg-white/90 hover:bg-white text-gray-700 rounded-lg px-2.5 py-1.5 text-xs font-medium flex items-center gap-1 shadow-sm"
                   >
-                    <ImagePlus size={12} /> Change
+                    <ImagePlus size={12} /> {T.change}
                   </button>
                   <button
                     type="button"
                     onClick={handleRemoveImage}
                     className="bg-white/90 hover:bg-white text-red-500 rounded-lg p-1.5 shadow-sm"
-                    title="Remove photo"
+                    title={T.removePhoto}
                   >
                     <Trash size={14} />
                   </button>
@@ -159,28 +163,32 @@ export default function DishModal({ dish, onSave, onClose, saving, serverError }
                 className="w-full h-32 border-2 border-dashed border-gray-300 hover:border-amber-400 rounded-xl flex flex-col items-center justify-center gap-2 text-gray-400 hover:text-amber-500 transition-colors"
               >
                 <ImagePlus size={24} />
-                <span className="text-sm">Click to upload a photo</span>
+                <span className="text-sm">{T.clickToUpload}</span>
               </button>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{isTakeout ? 'Restaurant Name' : 'Dish Name'} *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {isTakeout ? T.restaurantName : T.dishName} *
+            </label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder={isTakeout ? 'e.g. Thai Palace' : 'e.g. Spaghetti Bolognese'}
+              placeholder={isTakeout ? T.restaurantNamePlaceholder : T.dishNamePlaceholder}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{isTakeout ? 'Address / Notes' : 'Description'}</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {isTakeout ? T.addressNotes : T.description}
+            </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder={isTakeout ? 'Address, phone, or notes...' : 'Optional description...'}
+              placeholder={isTakeout ? T.addressNotes + '...' : T.description + '...'}
               rows={2}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none"
             />
@@ -188,7 +196,7 @@ export default function DishModal({ dish, onSave, onClose, saving, serverError }
 
           <div className={`grid gap-4 ${isTakeout ? 'grid-cols-1' : 'grid-cols-2'}`}>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{T.category}</label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
@@ -196,14 +204,14 @@ export default function DishModal({ dish, onSave, onClose, saving, serverError }
               >
                 {CATEGORIES.map((c) => (
                   <option key={c} value={c}>
-                    {c}
+                    {T.categories[c] ?? c}
                   </option>
                 ))}
               </select>
             </div>
             {!isTakeout && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Servings</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{T.servingsLabel}</label>
                 <input
                   type="number"
                   min={1}
@@ -219,8 +227,10 @@ export default function DishModal({ dish, onSave, onClose, saving, serverError }
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm font-medium text-gray-700">
-                {isTakeout ? 'Menu Items' : 'Ingredients'}{' '}
-                <span className="text-gray-400 font-normal">({isTakeout ? 'your go-to dishes' : 'recommended'})</span>
+                {isTakeout ? T.menuItemsLabel : T.ingredientsLabel}{' '}
+                <span className="text-gray-400 font-normal">
+                  ({isTakeout ? T.goToDishesHint : T.recommendedHint})
+                </span>
               </label>
               <button
                 type="button"
@@ -228,7 +238,7 @@ export default function DishModal({ dish, onSave, onClose, saving, serverError }
                 className="flex items-center gap-1 text-xs text-amber-600 hover:text-amber-800 font-medium"
               >
                 <Plus size={14} />
-                {isTakeout ? 'Add item' : 'Add ingredient'}
+                {isTakeout ? T.addItem : T.addIngredient}
               </button>
             </div>
             <div className="space-y-2">
@@ -238,7 +248,7 @@ export default function DishModal({ dish, onSave, onClose, saving, serverError }
                     type="text"
                     value={ing.name}
                     onChange={(e) => updateIngredient(i, 'name', e.target.value)}
-                    placeholder={isTakeout ? 'e.g. Pad Thai' : 'Ingredient'}
+                    placeholder={isTakeout ? T.takeoutItemPlaceholder : T.ingredientPlaceholder}
                     className="flex-1 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
                   />
                   {isTakeout ? (
@@ -246,7 +256,7 @@ export default function DishModal({ dish, onSave, onClose, saving, serverError }
                       type="text"
                       value={ing.quantity}
                       onChange={(e) => updateIngredient(i, 'quantity', e.target.value)}
-                      placeholder="Price"
+                      placeholder={T.pricePlaceholder}
                       className="w-20 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
                     />
                   ) : (
@@ -255,7 +265,7 @@ export default function DishModal({ dish, onSave, onClose, saving, serverError }
                         type="text"
                         value={ing.quantity}
                         onChange={(e) => updateIngredient(i, 'quantity', e.target.value)}
-                        placeholder="Qty"
+                        placeholder={T.qtyPlaceholder}
                         className="w-16 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
                       />
                       <select
@@ -289,14 +299,20 @@ export default function DishModal({ dish, onSave, onClose, saving, serverError }
               onClick={onClose}
               className="flex-1 border border-gray-300 text-gray-700 rounded-lg py-2.5 text-sm font-medium hover:bg-gray-50 transition-colors"
             >
-              Cancel
+              {T.cancel}
             </button>
             <button
               type="submit"
               disabled={saving}
               className="flex-1 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg py-2.5 text-sm font-medium transition-colors"
             >
-              {saving ? 'Saving...' : dish ? 'Save Changes' : isTakeout ? 'Add Restaurant' : 'Add Dish'}
+              {saving
+                ? T.saving
+                : dish
+                  ? T.saveChanges
+                  : isTakeout
+                    ? T.addRestaurant
+                    : T.addNewDish}
             </button>
           </div>
         </form>
