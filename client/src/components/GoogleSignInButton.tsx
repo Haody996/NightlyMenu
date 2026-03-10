@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import api from '../lib/api';
@@ -6,6 +7,17 @@ import { useAuth } from '../contexts/AuthContext';
 export default function GoogleSignInButton() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(400);
+
+  useEffect(() => {
+    if (!wrapperRef.current) return;
+    const ro = new ResizeObserver(([entry]) => {
+      setWidth(Math.floor(entry.contentRect.width));
+    });
+    ro.observe(wrapperRef.current);
+    return () => ro.disconnect();
+  }, []);
 
   async function handleSuccess(credentialResponse: { credential?: string }) {
     if (!credentialResponse.credential) return;
@@ -23,14 +35,16 @@ export default function GoogleSignInButton() {
   }
 
   return (
-    <GoogleLogin
-      onSuccess={handleSuccess}
-      onError={() => {}}
-      useOneTap={false}
-      shape="rectangular"
-      size="large"
-      width="100%"
-      text="continue_with"
-    />
+    <div ref={wrapperRef} className="w-full">
+      <GoogleLogin
+        onSuccess={handleSuccess}
+        onError={() => {}}
+        useOneTap={false}
+        shape="rectangular"
+        size="large"
+        width={width}
+        text="continue_with"
+      />
+    </div>
   );
 }

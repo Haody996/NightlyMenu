@@ -136,7 +136,7 @@ export default function MenuPage() {
   return (
     <div className="flex gap-6 items-start">
       {/* Main content */}
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 w-0">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-800">Menu</h1>
@@ -151,8 +151,8 @@ export default function MenuPage() {
           </button>
         </div>
 
-        <div className="flex gap-3 mb-6 flex-wrap">
-          <div className="relative flex-1 min-w-48">
+        <div className="flex flex-col sm:flex-row gap-3 mb-6">
+          <div className="relative w-full sm:flex-1">
             <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
@@ -162,7 +162,7 @@ export default function MenuPage() {
               className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
             />
           </div>
-          <div className="flex gap-1.5 flex-wrap">
+          <div className="flex gap-1.5 flex-wrap overflow-x-auto pb-0.5">
             {categories.map((cat) => (
               <button
                 key={cat}
@@ -192,7 +192,7 @@ export default function MenuPage() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
             {filtered.map((dish) => (
               <DishCard
                 key={dish.id}
@@ -211,8 +211,8 @@ export default function MenuPage() {
         )}
       </div>
 
-      {/* Tonight sidebar */}
-      <div className="w-60 shrink-0 sticky top-6">
+      {/* Tonight sidebar — desktop only */}
+      <div className="hidden lg:block w-60 shrink-0 sticky top-6">
         <div className="bg-white rounded-xl border border-amber-200 shadow-sm p-4">
           <div className="flex items-center gap-2 mb-3">
             <Moon size={16} className="text-amber-500" />
@@ -252,6 +252,21 @@ export default function MenuPage() {
           </Link>
         </div>
       </div>
+
+      {/* Tonight sticky bar — mobile only */}
+      {tonightDishes.length > 0 && (
+        <Link
+          to="/tonight"
+          className="lg:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 bg-amber-500 text-white px-5 py-3 rounded-2xl shadow-lg text-sm font-semibold"
+        >
+          <Moon size={16} />
+          Tonight's menu
+          <span className="bg-white text-amber-600 text-xs font-bold px-2 py-0.5 rounded-full">
+            {tonightDishes.length}
+          </span>
+          <ArrowRight size={14} />
+        </Link>
+      )}
 
       {modalDish !== undefined && (
         <DishModal
