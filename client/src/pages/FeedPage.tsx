@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { Sparkles, UtensilsCrossed } from 'lucide-react';
+import { Sparkles, UtensilsCrossed, BookOpen } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import api, { uploadsBase } from '../lib/api';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -195,6 +196,14 @@ export default function FeedPage() {
           <DishPost key={dish.id} dish={dish} />
         ))}
       </div>
+
+      <Link
+        to="/menu"
+        className="fixed bottom-6 right-4 z-40 flex items-center justify-center w-12 h-12 bg-amber-500 hover:bg-amber-600 text-white rounded-full shadow-lg transition-colors"
+        title="My Menu"
+      >
+        <BookOpen size={20} />
+      </Link>
 
       <div ref={sentinelRef} className="py-6 text-center">
         {isFetchingNextPage && (
