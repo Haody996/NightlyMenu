@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, UtensilsCrossed, LogIn, Moon, X, ArrowRight, Users } from 'lucide-react';
+import { Plus, Search, UtensilsCrossed, LogIn, Moon, X, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../lib/api';
 import type { Dish } from '../lib/types';
@@ -64,21 +64,7 @@ export default function MenuPage() {
   const [modalDish, setModalDish] = useState<Dish | null | undefined>(undefined);
   const [search, setSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState('All');
-  const [showFeedBtn, setShowFeedBtn] = useState(false);
-  const sentinelRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setShowFeedBtn(!entry.isIntersecting),
-      { threshold: 0 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [sentinelRef.current]);
-
-  const enabled = !!user && !!household;
+const enabled = !!user && !!household;
 
   const dishesQuery = useQuery({ queryKey: ['dishes'], queryFn: fetchDishes, enabled });
   const tonightQuery = useQuery({ queryKey: ['tonight'], queryFn: fetchTonightIds, enabled });
@@ -213,10 +199,8 @@ export default function MenuPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-            {filtered.map((dish, idx) => (
-              <>
-                {idx === 3 && <div key="sentinel" ref={sentinelRef} className="col-span-full h-0" />}
-                <DishCard
+            {filtered.map((dish) => (
+              <DishCard
                 key={dish.id}
                 dish={dish}
                 isTonight={tonightIds.has(dish.id)}
@@ -228,7 +212,6 @@ export default function MenuPage() {
                   if (confirm(T.deleteConfirm(dish.name))) deleteMutation.mutate(dish.id);
                 }}
               />
-              </>
             ))}
           </div>
         )}
@@ -291,18 +274,7 @@ export default function MenuPage() {
         </Link>
       )}
 
-      {/* Community feed floating button — appears after scrolling past ~3 cards */}
-      {showFeedBtn && (
-        <Link
-          to="/feed"
-          className="fixed bottom-20 right-4 z-40 flex items-center gap-2 bg-white border border-amber-200 text-amber-600 shadow-lg px-3.5 py-2.5 rounded-2xl text-sm font-medium transition-all hover:bg-amber-50 lg:bottom-6"
-        >
-          <Users size={16} />
-          Community
-        </Link>
-      )}
-
-      {modalDish !== undefined && (
+{modalDish !== undefined && (
         <DishModal
           dish={modalDish}
           onClose={() => setModalDish(undefined)}
