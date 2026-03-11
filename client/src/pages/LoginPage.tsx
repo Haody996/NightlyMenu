@@ -15,8 +15,6 @@ export default function LoginPage() {
   const [step, setStep]       = useState<Step>('email');
   const [email, setEmail]     = useState('');
   const [code, setCode]       = useState('');
-  const [name, setName]       = useState('');
-  const [isNew, setIsNew]     = useState(false);
   const [error, setError]     = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -25,8 +23,7 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
     try {
-      const res = await api.post('/auth/send-code', { email });
-      setIsNew(res.data.isNew);
+      await api.post('/auth/send-code', { email });
       setStep('code');
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? T.sendCodeFailed;
@@ -41,7 +38,7 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
     try {
-      const res = await api.post('/auth/verify-code', { email, code, name: name || undefined });
+      const res = await api.post('/auth/verify-code', { email, code });
       const meRes = await api.request({
         url: '/auth/me',
         headers: { Authorization: `Bearer ${res.data.token}` },
@@ -106,17 +103,6 @@ export default function LoginPage() {
             <p className="text-sm text-gray-500 text-center">
               {T.codeSentTo} <span className="font-medium text-gray-700">{email}</span>
             </p>
-            {isNew && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{T.nameLabel}</label>
-                <input
-                  type="text" value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder={T.yourNamePlaceholder}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-                />
-              </div>
-            )}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">{T.codeLabel}</label>
               <input
