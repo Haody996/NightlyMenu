@@ -6,7 +6,6 @@ import MenuPage      from './pages/MenuPage';
 import TonightPage   from './pages/TonightPage';
 import FeedPage      from './pages/FeedPage';
 import LoginModal    from './pages/LoginPage';
-import RegisterPage  from './pages/RegisterPage';
 import HouseholdPage from './pages/HouseholdPage';
 import InfoPage      from './pages/InfoPage';
 
