@@ -16,7 +16,7 @@ const en = {
 
   // MenuPage
   menuTitle: 'Menu',
-  addDish: 'Add Dish',
+  addDish: 'New Dish',
   searchPlaceholder: 'Search dishes or ingredients...',
   noDishesFound: 'No dishes found',
   addFirstDish: 'Add your first dish',
@@ -33,7 +33,7 @@ const en = {
   dishCount: (n: number) => `${n} dish${n !== 1 ? 'es' : ''}`,
 
   // TonightPage
-  tonightTitle: "Tonight's Menu",
+  tonightTitle: "On Menu",
   notifyHousehold: 'Notify household',
   notified: 'Notified!',
   sending: 'Sending\u2026',
@@ -236,7 +236,7 @@ const zh: typeof en = {
   dishCount: (n: number) => `${n} 道菜`,
 
   // TonightPage
-  tonightTitle: '今晚菜单',
+  tonightTitle: '今日菜单',
   notifyHousehold: '通知家庭成员',
   notified: '已通知！',
   sending: '发送中\u2026',

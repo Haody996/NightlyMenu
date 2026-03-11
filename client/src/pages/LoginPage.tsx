@@ -9,7 +9,7 @@ const isNative = !!(window as { Capacitor?: { isNativePlatform?: () => boolean }
 
 type Step = 'email' | 'code';
 
-export default function LoginPage() {
+export default function LoginModal() {
   const { login } = useAuth();
   const { T } = useLanguage();
   const [step, setStep]       = useState<Step>('email');
@@ -44,7 +44,6 @@ export default function LoginPage() {
         headers: { Authorization: `Bearer ${res.data.token}` },
       });
       login(res.data.token, res.data.user, meRes.data.household);
-      // navigate is handled by PublicOnlyRoute redirect after login
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? T.invalidCode;
       setError(msg);
@@ -54,8 +53,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-amber-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-black/30">
+      <div className="bg-white/90 backdrop-blur rounded-2xl shadow-2xl w-full max-w-sm p-8">
         <div className="flex items-center gap-2 text-amber-700 font-bold text-xl mb-8 justify-center">
           <UtensilsCrossed size={24} />
           Dinnerly

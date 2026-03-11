@@ -5,7 +5,7 @@ import { useLanguage } from './contexts/LanguageContext';
 import MenuPage      from './pages/MenuPage';
 import TonightPage   from './pages/TonightPage';
 import FeedPage      from './pages/FeedPage';
-import LoginPage     from './pages/LoginPage';
+import LoginModal    from './pages/LoginPage';
 import RegisterPage  from './pages/RegisterPage';
 import HouseholdPage from './pages/HouseholdPage';
 import InfoPage      from './pages/InfoPage';
@@ -19,21 +19,19 @@ function Spinner() {
   );
 }
 
-/** Redirect logged-in users away from /login and /register */
-function PublicOnlyRoute({ children }: { children: React.ReactNode }) {
-  const { user, household, isLoading } = useAuth();
-  if (isLoading) return <Spinner />;
-  if (user && household) return <Navigate to="/" replace />;
-  if (user && !household) return <Navigate to="/household" replace />;
-  return <>{children}</>;
-}
-
-/** Requires auth, but passes through even without a household */
+/** Requires auth; shows login modal overlay on current page instead of redirecting */
 function AuthedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
   if (isLoading) return <Spinner />;
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user) return <>{children}<LoginModal /></>;
   return <>{children}</>;
+}
+
+/** Global login modal for unauthenticated users on public pages */
+function GlobalLoginModal() {
+  const { user, isLoading } = useAuth();
+  if (isLoading || user) return null;
+  return <LoginModal />;
 }
 
 function LangToggle() {
@@ -97,21 +95,13 @@ function Layout({ children }: { children: React.ReactNode }) {
                       </button>
                     </>
                   ) : (
-                    <>
-                      <Link
-                        to="/login"
-                        className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-colors font-medium"
-                      >
-                        <LogIn size={15} />
-                        <span className="hidden sm:block">{T.signIn}</span>
-                      </Link>
-                      <Link
-                        to="/register"
-                        className="px-3 sm:px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-lg transition-colors"
-                      >
-                        {T.register}
-                      </Link>
-                    </>
+                    <Link
+                      to="/"
+                      className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-colors font-medium"
+                    >
+                      <LogIn size={15} />
+                      <span className="hidden sm:block">{T.signIn}</span>
+                    </Link>
                   )}
                 </>
               )}
@@ -141,8 +131,8 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login"    element={<PublicOnlyRoute><LoginPage /></PublicOnlyRoute>} />
-        <Route path="/register" element={<PublicOnlyRoute><RegisterPage /></PublicOnlyRoute>} />
+        <Route path="/login"    element={<Navigate to="/" replace />} />
+        <Route path="/register" element={<Navigate to="/" replace />} />
 
         <Route path="/household" element={
           <AuthedRoute><Layout><HouseholdPage /></Layout></AuthedRoute>
@@ -150,13 +140,14 @@ export default function App() {
 
         <Route path="/info" element={<InfoPage />} />
 
-        {/* Public — no redirect, pages handle unauthenticated state themselves */}
+        {/* Public — login modal overlays if not authenticated */}
         <Route path="/"        element={<Layout><MenuPage /></Layout>} />
         <Route path="/tonight" element={<Layout><TonightPage /></Layout>} />
         <Route path="/feed"    element={<Layout><FeedPage /></Layout>} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <GlobalLoginModal />
     </BrowserRouter>
   );
 }
