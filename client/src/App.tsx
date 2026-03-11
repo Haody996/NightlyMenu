@@ -30,7 +30,7 @@ function AuthedRoute({ children }: { children: React.ReactNode }) {
 function GlobalLoginModal() {
   const { user, isLoading } = useAuth();
   const { pathname } = useLocation();
-  if (isLoading || user || pathname === '/info') return null;
+  if (isLoading || user || pathname === '/info' || pathname === '/') return null;
   return <LoginModal />;
 }
 
