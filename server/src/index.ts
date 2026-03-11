@@ -26,6 +26,16 @@ app.use('/api/dishes', dishesRouter);
 app.use('/api/meal-plan', mealPlanRouter);
 app.use('/api/feed', feedRouter);
 
+const DEMO_HOUSEHOLD_ID = parseInt(process.env.DEMO_HOUSEHOLD_ID ?? '1', 10);
+
+app.get('/api/demo', (_req, res) => {
+  const db = require('./db').default;
+  const dishes = db.prepare('SELECT * FROM dishes WHERE household_id = ? ORDER BY created_at DESC').all(DEMO_HOUSEHOLD_ID);
+  const tonightRows = db.prepare('SELECT dish_id FROM meal_plan WHERE household_id = ?').all(DEMO_HOUSEHOLD_ID) as { dish_id: number }[];
+  const tonight_ids = tonightRows.map((r) => r.dish_id);
+  res.json({ dishes, tonight_ids });
+});
+
 app.listen(PORT, () => {
   console.log(`Meal Planner server running on http://localhost:${PORT}`);
 });

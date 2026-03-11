@@ -17,8 +17,8 @@ interface Props {
   dish: Dish;
   isTonight: boolean;
   onToggleTonight: () => void;
-  onEdit: () => void;
-  onDelete: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
 export default function DishCard({ dish, isTonight, onToggleTonight, onEdit, onDelete }: Props) {
@@ -99,20 +99,24 @@ export default function DishCard({ dish, isTonight, onToggleTonight, onEdit, onD
             {isTonight ? <Check size={14} /> : <Moon size={14} />}
             {isTonight ? T.onTonightsMenu : T.addToTonight}
           </button>
-          <button
-            onClick={onEdit}
-            className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
-            title={T.editDishTooltip}
-          >
-            <Pencil size={15} />
-          </button>
-          <button
-            onClick={onDelete}
-            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-            title={T.deleteDishTooltip}
-          >
-            <Trash2 size={15} />
-          </button>
+          {onEdit && (
+            <button
+              onClick={onEdit}
+              className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+              title={T.editDishTooltip}
+            >
+              <Pencil size={15} />
+            </button>
+          )}
+          {onDelete && (
+            <button
+              onClick={onDelete}
+              className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+              title={T.deleteDishTooltip}
+            >
+              <Trash2 size={15} />
+            </button>
+          )}
         </div>
       </div>
     </div>

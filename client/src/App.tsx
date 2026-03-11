@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, NavLink, Navigate, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, NavLink, Navigate, Link, useLocation } from 'react-router-dom';
 import { UtensilsCrossed, ShoppingCart, Home, LogOut, LogIn, Sparkles, BookOpen } from 'lucide-react';
 import { useAuth } from './contexts/AuthContext';
 import { useLanguage } from './contexts/LanguageContext';
@@ -26,10 +26,11 @@ function AuthedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-/** Global login modal for unauthenticated users on public pages */
+/** Global login modal for unauthenticated users — skipped on /info */
 function GlobalLoginModal() {
   const { user, isLoading } = useAuth();
-  if (isLoading || user) return null;
+  const { pathname } = useLocation();
+  if (isLoading || user || pathname === '/info') return null;
   return <LoginModal />;
 }
 

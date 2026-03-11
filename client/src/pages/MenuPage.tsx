@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, UtensilsCrossed, LogIn, Moon, X, ArrowRight } from 'lucide-react';
+import { Plus, Search, Moon, X, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+
 import api from '../lib/api';
 import type { Dish } from '../lib/types';
 import { useAuth } from '../contexts/AuthContext';
@@ -19,30 +20,9 @@ async function fetchTonightIds(): Promise<number[]> {
   return (res.data.dishes as Dish[]).map((d) => d.id);
 }
 
-function GuestBanner() {
-  const { T } = useLanguage();
-  return (
-    <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-amber-300">
-      <UtensilsCrossed size={48} className="mx-auto text-amber-300 mb-4" />
-      <h2 className="text-xl font-semibold text-gray-700 mb-2">{T.welcomeTitle}</h2>
-      <p className="text-gray-500 text-sm mb-6 max-w-xs mx-auto">{T.welcomeDesc}</p>
-      <div className="flex gap-3 justify-center">
-        <Link
-          to="/register"
-          className="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-xl transition-colors"
-        >
-          {T.getStarted}
-        </Link>
-        <Link
-          to="/login"
-          className="flex items-center gap-1.5 px-5 py-2.5 border border-gray-300 text-gray-600 hover:border-amber-400 text-sm font-medium rounded-xl transition-colors"
-        >
-          <LogIn size={14} />
-          {T.signIn}
-        </Link>
-      </div>
-    </div>
-  );
+async function fetchDemo(): Promise<{ dishes: Dish[]; tonight_ids: number[] }> {
+  const res = await api.get('/demo');
+  return res.data;
 }
 
 function NoHouseholdBanner() {
@@ -64,10 +44,11 @@ export default function MenuPage() {
   const [modalDish, setModalDish] = useState<Dish | null | undefined>(undefined);
   const [search, setSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState('All');
-const enabled = !!user && !!household;
+  const enabled = !!user && !!household;
 
   const dishesQuery = useQuery({ queryKey: ['dishes'], queryFn: fetchDishes, enabled });
   const tonightQuery = useQuery({ queryKey: ['tonight'], queryFn: fetchTonightIds, enabled });
+  const demoQuery = useQuery({ queryKey: ['demo'], queryFn: fetchDemo, enabled: !user });
 
   const saveMutation = useMutation({
     mutationFn: async (data: { id?: number; payload: object; imageFile?: File | null }) => {
@@ -111,14 +92,12 @@ const enabled = !!user && !!household;
     onSuccess: () => qc.invalidateQueries({ queryKey: ['tonight'] }),
   });
 
-  // Not logged in
-  if (!user) return <GuestBanner />;
-
   // Logged in but no household
-  if (!household) return <NoHouseholdBanner />;
+  if (user && !household) return <NoHouseholdBanner />;
 
-  const dishes = dishesQuery.data ?? [];
-  const tonightIds = new Set(tonightQuery.data ?? []);
+  const isDemo = !user;
+  const dishes = isDemo ? (demoQuery.data?.dishes ?? []) : (dishesQuery.data ?? []);
+  const tonightIds = new Set(isDemo ? (demoQuery.data?.tonight_ids ?? []) : (tonightQuery.data ?? []));
   const tonightDishes = dishes.filter((d) => tonightIds.has(d.id));
   // Category filter keys are always English (from DB); 'All' is our special value
   // Always show these key categories even if no dishes exist yet
@@ -135,7 +114,7 @@ const enabled = !!user && !!household;
     return matchesSearch && matchesCategory;
   });
 
-  if (dishesQuery.isLoading) {
+  if (isDemo ? demoQuery.isLoading : dishesQuery.isLoading) {
     return <div className="text-center text-gray-400 py-20">{T.loadingMenu}</div>;
   }
 
@@ -148,13 +127,15 @@ const enabled = !!user && !!household;
             <h1 className="text-2xl font-bold text-gray-800">{T.menuTitle}</h1>
             <p className="text-sm text-gray-500 mt-0.5">{T.dishesAvailable(dishes.length)}</p>
           </div>
-          <button
-            onClick={() => setModalDish(null)}
-            className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-colors shadow-sm"
-          >
-            <Plus size={16} />
-            {T.addDish}
-          </button>
+          {!isDemo && (
+            <button
+              onClick={() => setModalDish(null)}
+              className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-colors shadow-sm"
+            >
+              <Plus size={16} />
+              {T.addDish}
+            </button>
+          )}
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
@@ -204,11 +185,11 @@ const enabled = !!user && !!household;
                 key={dish.id}
                 dish={dish}
                 isTonight={tonightIds.has(dish.id)}
-                onToggleTonight={() =>
+                onToggleTonight={isDemo ? () => {} : () =>
                   toggleTonightMutation.mutate({ id: dish.id, isTonight: tonightIds.has(dish.id) })
                 }
-                onEdit={() => setModalDish(dish)}
-                onDelete={() => {
+                onEdit={isDemo ? undefined : () => setModalDish(dish)}
+                onDelete={isDemo ? undefined : () => {
                   if (confirm(T.deleteConfirm(dish.name))) deleteMutation.mutate(dish.id);
                 }}
               />
