@@ -87,7 +87,7 @@ export default function DishCard({ dish, isTonight, onToggleTonight, onEdit, onD
           </div>
         )}
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mt-3">
           <button
             onClick={onToggleTonight}
             className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-sm font-medium transition-colors ${

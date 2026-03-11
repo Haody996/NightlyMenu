@@ -46,8 +46,8 @@ const en = {
   totalServings: (n: number) => `\u00b7 ${n} total servings`,
 
   // DishCard
-  onTonightsMenu: "On Tonight's Menu",
-  addToTonight: 'Add to Tonight',
+  onTonightsMenu: "On Menu",
+  addToTonight: 'Add to Menu',
   editDishTooltip: 'Edit dish',
   deleteDishTooltip: 'Delete dish',
   servings: 'servings',
