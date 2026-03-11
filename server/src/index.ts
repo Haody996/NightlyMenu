@@ -30,7 +30,9 @@ const DEMO_HOUSEHOLD_ID = parseInt(process.env.DEMO_HOUSEHOLD_ID ?? '1', 10);
 
 app.get('/api/demo', (_req, res) => {
   const db = require('./db').default;
-  const dishes = db.prepare('SELECT * FROM dishes WHERE household_id = ? ORDER BY created_at DESC').all(DEMO_HOUSEHOLD_ID);
+  const rawDishes = db.prepare('SELECT * FROM dishes WHERE household_id = ? ORDER BY created_at DESC').all(DEMO_HOUSEHOLD_ID) as { id: number }[];
+  const getIngredients = db.prepare('SELECT * FROM ingredients WHERE dish_id = ?');
+  const dishes = rawDishes.map((d) => ({ ...d, ingredients: getIngredients.all(d.id) }));
   const tonightRows = db.prepare('SELECT dish_id FROM meal_plan WHERE household_id = ?').all(DEMO_HOUSEHOLD_ID) as { dish_id: number }[];
   const tonight_ids = tonightRows.map((r) => r.dish_id);
   res.json({ dishes, tonight_ids });
