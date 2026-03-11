@@ -59,7 +59,7 @@ function Layout({ children }: { children: React.ReactNode }) {
     }`;
 
   return (
-    <div className="min-h-screen bg-amber-50">
+    <div className="min-h-screen bg-amber-50 overflow-x-hidden">
       <header className="bg-white border-b border-amber-200 shadow-sm">
         <div className="max-w-5xl mx-auto px-4">
           {/* Top row: logo + auth */}

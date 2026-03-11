@@ -40,7 +40,7 @@ export default function InfoPage() {
     <div className="min-h-screen bg-white font-sans text-gray-800 overflow-x-hidden">
 
       {/* Nav */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-amber-100">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-amber-100" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 text-amber-700 font-bold text-xl">
             <UtensilsCrossed size={22} />
@@ -71,7 +71,7 @@ export default function InfoPage() {
       </header>
 
       {/* Hero */}
-      <section className="relative pt-32 pb-24 px-6 overflow-hidden">
+      <section className="relative pb-24 px-6 overflow-hidden" style={{ paddingTop: 'calc(8rem + env(safe-area-inset-top))' }}>
         <div className="absolute -top-32 -right-32 w-[600px] h-[600px] rounded-full bg-amber-100 opacity-50 blur-3xl pointer-events-none" />
         <div className="absolute -bottom-20 -left-32 w-[500px] h-[500px] rounded-full bg-orange-100 opacity-40 blur-3xl pointer-events-none" />
 
@@ -81,7 +81,7 @@ export default function InfoPage() {
             {T.infoHeroBadge}
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 leading-tight tracking-tight mb-6">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold text-gray-900 leading-tight tracking-tight mb-6">
             {T.infoHeroH1a}{' '}
             <span className="relative inline-block">
               <span className="relative z-10 text-amber-500">{T.infoHeroH1b}</span>
