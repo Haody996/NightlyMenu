@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, NavLink, Navigate, Link, useLocation } from 'react-router-dom';
+import { useState } from 'react';
 import { UtensilsCrossed, ShoppingCart, Home, LogOut, LogIn, Sparkles, BookOpen } from 'lucide-react';
 import { useAuth } from './contexts/AuthContext';
 import { useLanguage } from './contexts/LanguageContext';
@@ -26,12 +27,14 @@ function AuthedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-/** Global login modal for unauthenticated users — skipped on /info */
+/** Global login modal for unauthenticated users — skipped on /info and / */
 function GlobalLoginModal() {
   const { user, isLoading } = useAuth();
   const { pathname } = useLocation();
+  const [dismissed, setDismissed] = useState(false);
   if (isLoading || user || pathname === '/info' || pathname === '/') return null;
-  return <LoginModal />;
+  if (dismissed) return null;
+  return <LoginModal onDismiss={() => setDismissed(true)} />;
 }
 
 function LangToggle() {

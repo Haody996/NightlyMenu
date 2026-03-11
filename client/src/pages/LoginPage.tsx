@@ -9,7 +9,7 @@ const isNative = !!(window as { Capacitor?: { isNativePlatform?: () => boolean }
 
 type Step = 'email' | 'code';
 
-export default function LoginModal() {
+export default function LoginModal({ onDismiss }: { onDismiss?: () => void } = {}) {
   const { login } = useAuth();
   const { T } = useLanguage();
   const [step, setStep]       = useState<Step>('email');
@@ -53,8 +53,11 @@ export default function LoginModal() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-black/30">
-      <div className="bg-white/90 backdrop-blur rounded-2xl shadow-2xl w-full max-w-sm p-8">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-black/30"
+      onClick={onDismiss}
+    >
+      <div className="bg-white/90 backdrop-blur rounded-2xl shadow-2xl w-full max-w-sm p-8" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center gap-2 text-amber-700 font-bold text-xl mb-8 justify-center">
           <UtensilsCrossed size={24} />
           Dinnerly
