@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Search, UtensilsCrossed, LogIn, Moon, X, ArrowRight, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -65,12 +65,18 @@ export default function MenuPage() {
   const [search, setSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState('All');
   const [showFeedBtn, setShowFeedBtn] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const onScroll = () => setShowFeedBtn(window.scrollY > 400);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+    const el = sentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowFeedBtn(!entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [sentinelRef.current]);
 
   const enabled = !!user && !!household;
 
@@ -207,8 +213,10 @@ export default function MenuPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-            {filtered.map((dish) => (
-              <DishCard
+            {filtered.map((dish, idx) => (
+              <>
+                {idx === 3 && <div key="sentinel" ref={sentinelRef} className="col-span-full h-0" />}
+                <DishCard
                 key={dish.id}
                 dish={dish}
                 isTonight={tonightIds.has(dish.id)}
@@ -220,6 +228,7 @@ export default function MenuPage() {
                   if (confirm(T.deleteConfirm(dish.name))) deleteMutation.mutate(dish.id);
                 }}
               />
+              </>
             ))}
           </div>
         )}
