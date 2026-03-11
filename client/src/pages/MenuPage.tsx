@@ -122,7 +122,11 @@ export default function MenuPage() {
   const tonightIds = new Set(tonightQuery.data ?? []);
   const tonightDishes = dishes.filter((d) => tonightIds.has(d.id));
   // Category filter keys are always English (from DB); 'All' is our special value
-  const categories = ['All', ...Array.from(new Set(dishes.map((d) => d.category))).sort()];
+  // Always show these key categories even if no dishes exist yet
+  const PINNED_CATEGORIES = ['Main', 'Dessert', 'Dine Out'];
+  const dishCategories = Array.from(new Set(dishes.map((d) => d.category)));
+  const allCategories = Array.from(new Set([...PINNED_CATEGORIES, ...dishCategories])).sort();
+  const categories = ['All', ...allCategories];
 
   const filtered = dishes.filter((d) => {
     const matchesSearch =

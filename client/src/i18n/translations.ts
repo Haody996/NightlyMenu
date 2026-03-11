@@ -158,6 +158,7 @@ const en = {
     Drink: 'Drink',
     Snack: 'Snack',
     Takeout: 'Takeout',
+    'Dine Out': 'Dine Out',
   } as Record<string, string>,
 
   // Delete confirm
@@ -360,6 +361,7 @@ const zh: typeof en = {
     Drink: '饮料',
     Snack: '小食',
     Takeout: '外卖',
+    'Dine Out': '外出就餐',
   } as Record<string, string>,
 
   // Delete confirm

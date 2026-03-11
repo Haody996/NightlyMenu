@@ -25,7 +25,7 @@ interface Props {
   serverError?: string;
 }
 
-const CATEGORIES = ['Starter', 'Main', 'Side', 'Dessert', 'Drink', 'Snack', 'Takeout'];
+const CATEGORIES = ['Starter', 'Main', 'Side', 'Dessert', 'Drink', 'Snack', 'Takeout', 'Dine Out'];
 const UNITS = ['', 'g', 'kg', 'oz', 'lbs', 'ml', 'L', 'tsp', 'tbsp', 'cup', 'pieces', 'slices', 'cans', 'bunches', 'cloves'];
 
 function toIngredientDraft(ing: Ingredient): IngredientDraft {
