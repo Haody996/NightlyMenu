@@ -43,6 +43,15 @@ router.post('/', (req: Request, res: Response) => {
       .run(name.trim(), generateCode());
     const id = result.lastInsertRowid as number;
     db.prepare('INSERT INTO household_members (household_id, user_id) VALUES (?, ?)').run(id, req.userId);
+
+    const insertDish = db.prepare(
+      'INSERT INTO dishes (household_id, name, category) VALUES (?, ?, ?)'
+    );
+    insertDish.run(id, 'Broccoli', 'Starter');
+    insertDish.run(id, 'Steak', 'Main');
+    insertDish.run(id, 'Corn and Fries', 'Main');
+    insertDish.run(id, 'Tiramisu', 'Dessert');
+
     return id;
   })();
 
