@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, UtensilsCrossed, LogIn, Moon, X, ArrowRight } from 'lucide-react';
+import { Plus, Search, UtensilsCrossed, LogIn, Moon, X, ArrowRight, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../lib/api';
 import type { Dish } from '../lib/types';
@@ -64,6 +64,13 @@ export default function MenuPage() {
   const [modalDish, setModalDish] = useState<Dish | null | undefined>(undefined);
   const [search, setSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState('All');
+  const [showFeedBtn, setShowFeedBtn] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setShowFeedBtn(window.scrollY > 400);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const enabled = !!user && !!household;
 
@@ -272,6 +279,17 @@ export default function MenuPage() {
             {tonightDishes.length}
           </span>
           <ArrowRight size={14} />
+        </Link>
+      )}
+
+      {/* Community feed floating button — appears after scrolling past ~3 cards */}
+      {showFeedBtn && (
+        <Link
+          to="/feed"
+          className="fixed bottom-20 right-4 z-40 flex items-center gap-2 bg-white border border-amber-200 text-amber-600 shadow-lg px-3.5 py-2.5 rounded-2xl text-sm font-medium transition-all hover:bg-amber-50 lg:bottom-6"
+        >
+          <Users size={16} />
+          Community
         </Link>
       )}
 
